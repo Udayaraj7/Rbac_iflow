@@ -1,0 +1,149 @@
+_schema-version: 3.3.0
+ID: InventoryManagement
+description: A simple CAP project.
+version: 1.0.0
+
+modules:
+  - name: InventoryManagement-srv
+    type: nodejs
+    path: gen/srv
+    requires:
+      - name: InventoryManagement-db
+      - name: uaa_InventoryManagement
+      - name: InventoryManagement-destination-service
+    provides:
+      - name: srv-api
+        properties:
+          srv-url: ${default-url}
+    parameters:
+      buildpack: nodejs_buildpack
+      instances: 1
+    build-parameters:
+      builder: npm-ci
+
+  - name: InventoryManagement-db-deployer
+    type: hdb
+    path: gen/db
+    requires:
+      - name: InventoryManagement-db
+    parameters:
+      buildpack: nodejs_buildpack
+
+  - name: InventoryManagement-destination-content
+    type: com.sap.application.content
+    requires:
+      - name: InventoryManagement-destination-service
+        parameters:
+          content-target: true
+      - name: InventoryManagement_html_repo_host
+        parameters:
+          service-key:
+            name: InventoryManagement_html_repo_host-key
+      - name: uaa_InventoryManagement
+        parameters:
+          service-key:
+            name: uaa_InventoryManagement-key
+      - name: srv-api
+    parameters:
+      content:
+        instance:
+          destinations:
+            - Name: srv-api
+              Authentication: OAuth2UserTokenExchange
+              ServiceInstanceName: InventoryManagement-xsuaa-service
+              ServiceKeyName: uaa_InventoryManagement-key
+              URL: ~{srv-api/srv-url}
+              sap.cloud.service: InventoryApp
+
+            - Name: InventoryApp_InventoryManagement_html_repo_host
+              ServiceInstanceName: InventoryManagement-html5-app-host-service
+              ServiceKeyName: InventoryManagement_html_repo_host-key
+              sap.cloud.service: InventoryApp
+
+            - Name: InventoryApp_uaa_InventoryManagement
+              Authentication: OAuth2UserTokenExchange
+              ServiceInstanceName: InventoryManagement-xsuaa-service
+              ServiceKeyName: uaa_InventoryManagement-key
+              sap.cloud.service: InventoryApp
+
+          existing_destinations_policy: update
+    build-parameters:
+      no-source: true
+
+  - name: InventoryManagement-app-content
+    type: com.sap.application.content
+    path: .
+    requires:
+      - name: InventoryManagement_html_repo_host
+        parameters:
+          content-target: true
+    build-parameters:
+      build-result: resources
+      requires:
+        - name: inventoryapp14
+          artifacts:
+            - inventoryapp14.zip
+          target-path: resources/
+
+  - name: inventoryapp14
+    type: html5
+    path: app/inventoryapp14
+    build-parameters:
+      build-result: dist
+      builder: custom
+      commands:
+        - npm install
+        - npm run build:cf
+      supported-platforms: []
+
+resources:
+  - name: InventoryManagement-db
+    type: com.sap.xs.hdi-container
+    parameters:
+      service: hana
+      service-plan: hdi-shared
+
+  - name: InventoryManagement-destination-service
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: destination
+      service-name: InventoryManagement-destination-service
+      service-plan: lite
+      config:
+        HTML5Runtime_enabled: true
+        version: 1.0.0
+        init_data:
+          instance:
+            destinations:
+              - Name: ui5
+                Authentication: NoAuthentication
+                ProxyType: Internet
+                Type: HTTP
+                URL: https://ui5.sap.com
+            existing_destinations_policy: update
+
+  - name: InventoryManagement_html_repo_host
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: html5-apps-repo
+      service-name: InventoryManagement-html5-app-host-service
+      service-plan: app-host
+
+  - name: uaa_InventoryManagement
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: xsuaa
+      service-name: InventoryManagement-xsuaa-service
+      service-plan: application
+      path: ./xs-security.json
+
+parameters:
+  deploy_mode: html5-repo
+  enable-parallel-deployments: true
+
+build-parameters:
+  before-all:
+    - builder: custom
+      commands:
+        - npm ci
+        - npx cds build --production
