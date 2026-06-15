@@ -1,0 +1,104 @@
+<mvc:View
+    controllerName="wizardstepobj.controller.View1"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core">
+
+    <App id="app">
+        <pages>
+
+            <Page
+                id="mainPage"
+                title="Wizard App"
+                enableScrolling="false">
+
+                <footer>
+                    <OverflowToolbar id="overflowtoolbarwizard">
+                        <ToolbarSpacer />
+                        <Button
+                            id="previousStepButton"
+                            text="Previous"
+                            visible="false"
+                            press="onPreviousStep" />
+                        <Button
+                            id="nextStepButton"
+                            text="Next"
+                            type="Emphasized"
+                            press="onNextStep" />
+                    </OverflowToolbar>
+                </footer>
+
+                <content>
+                    <Wizard
+                        id="wizard"
+                        showNextButton="false"
+                        renderMode="Page"
+                        stepActivate="onStepActivate"
+                        height="100%">
+
+                        <!-- STEP 1 -->
+                        <WizardStep id="step1" title="Step 1">
+                            <VBox class="sapUiMediumMargin">
+                                <Title text="Step 1 - Introduction" />
+                                <Text
+                                    text="This is the first step of the wizard."
+                                    class="sapUiSmallMarginTop" />
+                            </VBox>
+                        </WizardStep>
+
+                        <!-- STEP 2 -->
+                        <WizardStep id="step2" title="Inventory Details">
+                            <VBox class="sapUiMediumMargin">
+
+                                <Title text="Step 2 - Inventory Object Page" />
+
+                                <!-- Button to open Object Page via Cross-App Navigation -->
+                                <Button
+                                    id="openObjectPageBtn"
+                                    text="Open Inventory Object Page"
+                                    type="Emphasized"
+                                    icon="sap-icon://detail-view"
+                                    class="sapUiSmallMarginTop sapUiSmallMarginBottom"
+                                    press="onOpenInventoryPage" />
+
+                                <!-- Busy indicator while checking navigation -->
+                                <BusyIndicator
+                                    id="step2BusyIndicator"
+                                    visible="false"
+                                    class="sapUiSmallMarginTop" />
+
+                                <!-- Status strip — updates after button press -->
+                                <MessageStrip
+                                    id="navStatusStrip"
+                                    text="Click the button above to open the Inventory Object Page."
+                                    type="Information"
+                                    showIcon="true"
+                                    visible="true"
+                                    class="sapUiSmallMarginTop" />
+
+                            </VBox>
+                        </WizardStep>
+
+                        <!-- STEP 3 -->
+                        <WizardStep id="step3" title="Finish">
+                            <VBox class="sapUiMediumMargin">
+                                <Title text="Step 3 - Completed" />
+                                <Text
+                                    text="All steps completed successfully."
+                                    class="sapUiSmallMarginTop" />
+                                <MessageStrip
+                                    text="Wizard finished! You can now submit."
+                                    type="Success"
+                                    showIcon="true"
+                                    class="sapUiSmallMarginTop" />
+                            </VBox>
+                        </WizardStep>
+
+                    </Wizard>
+                </content>
+
+            </Page>
+        </pages>
+    </App>
+
+</mvc:View>

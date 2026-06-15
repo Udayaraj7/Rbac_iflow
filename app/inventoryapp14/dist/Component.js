@@ -1,2 +1,2 @@
-sap.ui.define(["sap/fe/core/AppComponent"],function(e){"use strict";return e.extend("inventoryapp14.Component",{metadata:{manifest:"json"}})});
+sap.ui.define(["sap/fe/core/AppComponent"],function(t){"use strict";return t.extend("inventoryapp14.Component",{metadata:{manifest:"json"},init:function(){t.prototype.init.apply(this,arguments);var e=this.getComponentData();var i=e&&e.startupParameters;console.log("Startup params:",JSON.stringify(i));if(i&&i["id"]){var a=Array.isArray(i["id"])?i["id"][0]:i["id"];console.log("Direct navigate to product:",a);this.getRouter().navTo("ProductsObjectPage",{key:"id='"+a+"',IsActiveEntity=true"})}}})});
 //# sourceMappingURL=Component.js.map

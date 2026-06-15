@@ -1,0 +1,42 @@
+{
+  "welcomeFile": "/index.html",
+  "authenticationMethod": "route",
+
+  "responseHeaders": [
+    {
+      "name": "X-Frame-Options",
+      "value": "ALLOWALL"
+    },
+    {
+      "name": "Content-Security-Policy",
+      "value": "frame-ancestors *"
+    }
+  ],
+
+  "routes": [
+    {
+  "source": "^/odata/(.*)$",
+  "target": "/odata/$1",
+  "destination": "srv-api",
+  "authenticationType": "xsuaa"
+},
+    {
+      "source": "^/resources/(.*)$",
+      "target": "/resources/$1",
+      "authenticationType": "none",
+      "destination": "ui5"
+    },
+    {
+      "source": "^/test-resources/(.*)$",
+      "target": "/test-resources/$1",
+      "authenticationType": "none",
+      "destination": "ui5"
+    },
+    {
+      "source": "^(.*)$",
+      "target": "$1",
+      "service": "html5-apps-repo-rt",
+      "authenticationType": "xsuaa"
+    }
+  ]
+}
