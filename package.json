@@ -41,7 +41,7 @@
         }
       },
       "db": "hana",
-      "auth": "xsuaa",
+      "auth": "dummy",
       "xsuaa": {
         "kind": "xsuaa"
       }
